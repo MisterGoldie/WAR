@@ -17,6 +17,7 @@ declare module 'frog' {
   }
 
   export const Button: FC<ButtonProps>
+  export const handle: (app: Frog) => any
   
   export interface FrogOptions {
     basePath?: string
@@ -46,11 +47,6 @@ declare module 'frog' {
     frame: (path: string, handler: (context: Context) => void) => void
     use: (middleware: any) => this
   }
-}
-
-declare module 'frog/vercel' {
-  import { Frog } from 'frog'
-  export const handle: (app: Frog) => any
 }
 
 declare module 'frog/middlewares' {
