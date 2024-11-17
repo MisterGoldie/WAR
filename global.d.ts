@@ -57,6 +57,8 @@ declare module 'frog' {
     frame: (path: string, handler: (context: Context) => void) => void
     use: (middleware: any) => this
   }
+
+  export const createHandler: (app: Frog) => any
 }
 
 declare module 'frog/middlewares' {
