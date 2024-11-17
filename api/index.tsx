@@ -12,6 +12,9 @@ const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!
 const AIRSTACK_API_KEY = process.env.AIRSTACK_API_KEY!
 const AIRSTACK_API_KEY_SECONDARY = process.env.AIRSTACK_API_KEY_SECONDARY!
 
+// Add background image URL
+const backgroundUrl = 'https://bafybeic3qu53tn46qmtgvterldnbbavt2h5y2x7unpyyc7txh2kcx6f6jm.ipfs.w3s.link/Frame%2039%20(3).png'
+
 // Game Logic Interfaces
 interface Card {
   value: number
@@ -202,23 +205,123 @@ app.frame('/', (c: FrameContext) => {
   
   const buttons = []
   if (gameStatus === 'initial' || gameStatus === 'playing') {
-    buttons.push(<button>Draw Card</button>)
+    buttons.push(<Button action="/draw_card">Draw Card</Button>)
   }
   
   if (gameStatus === 'war') {
-    buttons.push(<button>Continue War</button>)
+    buttons.push(<Button action="/continue_war">Continue War</Button>)
   }
   
-  buttons.push(<button>Reset Game</button>)
-  buttons.push(<button>Rules</button>)
+  buttons.push(<Button action="/reset_game">Reset Game</Button>)
+  buttons.push(<Button action="/view_rules">Rules</Button>)
   
-  if (gameStatus === 'ended') {
-    buttons.push(<button>Exit Game</button>)
-  }
-
   return c.res({
-    image: <GameUI state={gameState} />,
-    intents: buttons
+    image: (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '1080px',
+          height: '1080px',
+          backgroundImage: `url(${backgroundUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          color: 'white',
+          padding: '40px',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '40px'
+          }}
+        >
+          <h1 
+            style={{ 
+              fontSize: '64px',
+              textAlign: 'center',
+              margin: 0
+            }}
+          >
+            War Card Game
+          </h1>
+          
+          <div
+            style={{
+              display: 'flex',
+              fontSize: '32px',
+              textAlign: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              padding: '20px',
+              borderRadius: '15px',
+              maxWidth: '800px',
+              justifyContent: 'center'
+            }}
+          >
+            Player Cards: {gameState.playerDeck.length} | Computer Cards: {gameState.computerDeck.length}
+          </div>
+          
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              width: '100%',
+              gap: '40px'
+            }}
+          >
+            {gameState.playerCard && (
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{ fontSize: '24px', marginBottom: '10px' }}>Your Card</h3>
+                <img
+                  src={`/assets/cards/${gameState.playerCard.filename}`}
+                  alt={gameState.playerCard.label}
+                  style={{ width: '200px', height: '280px' }}
+                />
+              </div>
+            )}
+            
+            {gameState.computerCard && (
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{ fontSize: '24px', marginBottom: '10px' }}>Computer's Card</h3>
+                <img
+                  src={`/assets/cards/${gameState.computerCard.filename}`}
+                  alt={gameState.computerCard.label}
+                  style={{ width: '200px', height: '280px' }}
+                />
+              </div>
+            )}
+          </div>
+          
+          <div
+            style={{
+              fontSize: '36px',
+              textAlign: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              padding: '20px',
+              borderRadius: '10px',
+              maxWidth: '800px'
+            }}
+          >
+            {gameState.isWar ? "⚔️ WAR! ⚔️" : gameState.message}
+          </div>
+        </div>
+      </div>
+    ),
+    intents: buttons,
+    meta: {
+      title: "War Card Game",
+      description: "A classic card game of War",
+      image: {
+        src: backgroundUrl,
+        aspectRatio: "1:1"
+      },
+      theme: {
+        accent: "#1a472a"
+      }
+    }
   })
 })
 
@@ -231,7 +334,18 @@ app.frame('/draw_card', (c: Context) => {
     gameState.gameStatus = 'ended'
     return c.res({
       image: <GameUI state={gameState} />,
-      intents: [<button action="/">Return to Game</button>]
+      intents: [<Button action="/">Return to Game</Button>],
+      meta: {
+        title: "War Card Game",
+        description: "A classic card game of War",
+        image: {
+          src: backgroundUrl,
+          aspectRatio: "1:1"
+        },
+        theme: {
+          accent: "#1a472a"
+        }
+      }
     })
   }
 
@@ -260,7 +374,18 @@ app.frame('/draw_card', (c: Context) => {
   
   return c.res({
     image: <GameUI state={gameState} />,
-    intents: [<button action="/">Return to Game</button>]
+    intents: [<Button action="/">Return to Game</Button>],
+    meta: {
+      title: "War Card Game",
+      description: "A classic card game of War",
+      image: {
+        src: backgroundUrl,
+        aspectRatio: "1:1"
+      },
+      theme: {
+        accent: "#1a472a"
+      }
+    }
   })
 })
 
@@ -273,7 +398,18 @@ app.frame('/continue_war', (c: Context) => {
     gameState.gameStatus = 'ended'
     return c.res({
       image: <GameUI state={gameState} />,
-      intents: [<button action="/">Return to Game</button>]
+      intents: [<Button action="/">Return to Game</Button>],
+      meta: {
+        title: "War Card Game",
+        description: "A classic card game of War",
+        image: {
+          src: backgroundUrl,
+          aspectRatio: "1:1"
+        },
+        theme: {
+          accent: "#1a472a"
+        }
+      }
     })
   }
 
@@ -307,7 +443,18 @@ app.frame('/continue_war', (c: Context) => {
   
   return c.res({
     image: <GameUI state={gameState} />,
-    intents: [<button action="/">Return to Game</button>]
+    intents: [<Button action="/">Return to Game</Button>],
+    meta: {
+      title: "War Card Game",
+      description: "A classic card game of War",
+      image: {
+        src: backgroundUrl,
+        aspectRatio: "1:1"
+      },
+      theme: {
+        accent: "#1a472a"
+      }
+    }
   })
 })
 
@@ -316,7 +463,18 @@ app.frame('/reset_game', (c: Context) => {
   gameState = createInitialState()
   return c.res({
     image: <GameUI state={gameState} />,
-    intents: [<button action="/">Return to Game</button>]
+    intents: [<Button action="/">Return to Game</Button>],
+    meta: {
+      title: "War Card Game",
+      description: "A classic card game of War",
+      image: {
+        src: backgroundUrl,
+        aspectRatio: "1:1"
+      },
+      theme: {
+        accent: "#1a472a"
+      }
+    }
   })
 })
 
@@ -325,17 +483,18 @@ app.frame('/view_rules', (c: Context) => {
   gameState.message = 'Each player draws a card. Higher card wins! If cards match, WAR begins!'
   return c.res({
     image: <GameUI state={gameState} />,
-    intents: [<button action="/">Return to Game</button>]
-  })
-})
-
-// Exit game action
-app.frame('/exit_game', (c: Context) => {
-  gameState.message = 'Thanks for playing! Come back soon!'
-  gameState.gameStatus = 'ended'
-  return c.res({
-    image: <GameUI state={gameState} />,
-    intents: [<button action="/">Return to Game</button>]
+    intents: [<Button action="/">Return to Game</Button>],
+    meta: {
+      title: "War Card Game",
+      description: "A classic card game of War",
+      image: {
+        src: backgroundUrl,
+        aspectRatio: "1:1"
+      },
+      theme: {
+        accent: "#1a472a"
+      }
+    }
   })
 })
 

@@ -8,6 +8,17 @@ declare module 'frog' {
     res: (options: { 
       image: JSX.Element, 
       intents: JSX.Element[] 
+      meta?: {
+        title?: string
+        description?: string
+        image?: {
+          src: string
+          aspectRatio?: string
+        }
+        theme?: {
+          accent?: string
+        }
+      }
     }) => void
   }
 
@@ -16,7 +27,7 @@ declare module 'frog' {
     children: string | JSX.Element
   }
 
-  export const Button: FC<ButtonProps>
+  export const Button: (props: ButtonProps) => JSX.Element
   export const handle: (app: Frog) => any
   
   export interface FrogOptions {
