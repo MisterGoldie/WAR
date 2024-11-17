@@ -52,8 +52,6 @@ declare module 'frog' {
     }
   }
 
-  export const serve: (app: Frog) => { GET: any; POST: any }
-
   export class Frog {
     constructor(options: FrogOptions)
     frame: (path: string, handler: (context: Context) => void) => void
@@ -94,3 +92,8 @@ declare namespace JSX {
       span: any;
     }
   }
+
+declare module 'frog/vercel' {
+  import { Frog } from 'frog'
+  export const serve: (app: Frog) => { GET: any; POST: any }
+}
