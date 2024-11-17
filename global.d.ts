@@ -1,14 +1,6 @@
 /// <reference types="frog/jsx" />
 
 declare module 'frog' {
-  export * from 'frog'
-}
-
-declare module 'frog/jsx' {
-  export * from 'frog/jsx'
-}
-
-declare module 'frog/vercel' {
   import { FC } from 'react'
   import { JSX } from 'frog/jsx'
   
@@ -39,14 +31,44 @@ declare module 'frog/vercel' {
     }
     title?: string
     initialState?: any
+    hub?: {
+      apiUrl: string
+      fetchOptions: {
+        headers: {
+          [key: string]: string
+        }
+      }
+    }
   }
 
   export class Frog {
     constructor(options: FrogOptions)
     frame: (path: string, handler: (context: Context) => void) => void
+    use: (middleware: any) => this
   }
   
   export const handle: (app: Frog) => any
+}
+
+declare module 'frog/middlewares' {
+  export interface NeynarVariables {
+    interactor: {
+      fid: number
+    }
+    cast?: {
+      fid: number
+      hash: string
+    }
+  }
+
+  export function neynar(options: {
+    apiKey: string
+    features: string[]
+  }): any
+}
+
+declare module 'frog/jsx' {
+  export * from 'frog/jsx'
 }
 
 declare namespace JSX {

@@ -1,10 +1,15 @@
 /** @jsxImportSource frog/jsx */
 
-import { Button, Frog, Context, handle } from 'frog/vercel'
+import { Button, Frog, Context, handle } from 'frog'
+import { neynar } from 'frog/middlewares'
 import dotenv from 'dotenv'
 
 // Load environment variables
 dotenv.config()
+
+const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!
+const AIRSTACK_API_KEY = process.env.AIRSTACK_API_KEY!
+const AIRSTACK_API_KEY_SECONDARY = process.env.AIRSTACK_API_KEY_SECONDARY!
 
 // Game Logic Interfaces
 interface Card {
@@ -25,12 +30,12 @@ interface GameState {
   isWar: boolean
 }
 
-// Initialize the Frog app
+// Initialize the Frog app with Neynar integration
 export const app = new Frog({
   basePath: '/api',
   imageOptions: {
-    width: 1200,
-    height: 628,
+    width: 1080,
+    height: 1080,
     fonts: [
       {
         name: 'Gloria Hallelujah',
@@ -41,7 +46,21 @@ export const app = new Frog({
   },
   title: 'War Card Game',
   initialState: createInitialState(),
-})
+  hub: {
+    apiUrl: "https://hubs.airstack.xyz",
+    fetchOptions: {
+      headers: {
+        "x-airstack-hubs": AIRSTACK_API_KEY,
+        "x-airstack-hubs-secondary": AIRSTACK_API_KEY_SECONDARY
+      }
+    }
+  }
+}).use(
+  neynar({
+    apiKey: NEYNAR_API_KEY,
+    features: ['interactor', 'cast'],
+  })
+)
 
 // Function to create game UI component
 const GameUI = ({ state }: { state: GameState }) => {
@@ -182,18 +201,18 @@ app.frame('/', (c: FrameContext) => {
   
   const buttons = []
   if (gameStatus === 'initial' || gameStatus === 'playing') {
-    buttons.push(<button action="/draw_card">Draw Card</button>)
+    buttons.push(<button>Draw Card</button>)
   }
   
   if (gameStatus === 'war') {
-    buttons.push(<button action="/continue_war">Continue War</button>)
+    buttons.push(<button>Continue War</button>)
   }
   
-  buttons.push(<button action="/reset_game">Reset Game</button>)
-  buttons.push(<button action="/view_rules">Rules</button>)
+  buttons.push(<button>Reset Game</button>)
+  buttons.push(<button>Rules</button>)
   
   if (gameStatus === 'ended') {
-    buttons.push(<button action="/exit_game">Exit Game</button>)
+    buttons.push(<button>Exit Game</button>)
   }
 
   return c.res({
