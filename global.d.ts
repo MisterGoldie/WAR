@@ -62,6 +62,7 @@ declare module 'frog' {
 declare module 'frog/vercel' {
   import { Frog } from 'frog'
   export const handle: (app: Frog) => any
+  export const serve: (app: Frog) => { GET: any; POST: any }
 }
 
 declare module 'frog/middlewares' {
