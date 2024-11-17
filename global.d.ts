@@ -97,5 +97,5 @@ declare namespace JSX {
 
 declare module 'frog/vercel' {
   import { Frog } from 'frog'
-  export const createFrameHandler: (app: Frog) => { GET: any; POST: any }
+  export const handle: (app: Frog) => { GET: any; POST: any }
 }
