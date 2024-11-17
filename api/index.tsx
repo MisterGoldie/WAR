@@ -333,7 +333,7 @@ app.frame('/draw_card', (c: Context) => {
     gameState.message = `Game Over! ${playerDeck.length ? 'Player' : 'Computer'} Wins!`
     gameState.gameStatus = 'ended'
     return c.res({
-      image: <GameUI state={gameState} />,
+      image: GameUI({ state: gameState }),
       intents: [<Button action="/">Return to Game</Button>],
       meta: {
         title: "War Card Game",
@@ -371,9 +371,8 @@ app.frame('/draw_card', (c: Context) => {
     }
     gameState.gameStatus = 'playing'
   }
-  
   return c.res({
-    image: <GameUI state={gameState} />,
+    image: GameUI({ state: gameState }),
     intents: [<Button action="/">Return to Game</Button>],
     meta: {
       title: "War Card Game",
@@ -397,7 +396,7 @@ app.frame('/continue_war', (c: Context) => {
     gameState.message = `${playerDeck.length > computerDeck.length ? 'Player' : 'Computer'} wins the war by default!`
     gameState.gameStatus = 'ended'
     return c.res({
-      image: <GameUI state={gameState} />,
+      image: GameUI({ state: gameState }),
       intents: [<Button action="/">Return to Game</Button>],
       meta: {
         title: "War Card Game",
@@ -440,9 +439,8 @@ app.frame('/continue_war', (c: Context) => {
     gameState.isWar = false
     gameState.gameStatus = 'playing'
   }
-  
   return c.res({
-    image: <GameUI state={gameState} />,
+    image: GameUI({ state: gameState }),
     intents: [<Button action="/">Return to Game</Button>],
     meta: {
       title: "War Card Game",
@@ -462,7 +460,7 @@ app.frame('/continue_war', (c: Context) => {
 app.frame('/reset_game', (c: Context) => {
   gameState = createInitialState()
   return c.res({
-    image: <GameUI state={gameState} />,
+    image: GameUI({ state: gameState }),
     intents: [<Button action="/">Return to Game</Button>],
     meta: {
       title: "War Card Game",
@@ -482,7 +480,7 @@ app.frame('/reset_game', (c: Context) => {
 app.frame('/view_rules', (c: Context) => {
   gameState.message = 'Each player draws a card. Higher card wins! If cards match, WAR begins!'
   return c.res({
-    image: <GameUI state={gameState} />,
+    image: GameUI({ state: gameState }),
     intents: [<Button action="/">Return to Game</Button>],
     meta: {
       title: "War Card Game",
