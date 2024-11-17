@@ -58,7 +58,7 @@ declare module 'frog' {
     use: (middleware: any) => this
   }
 
-  export const createHandler: (app: Frog) => any
+  export const serve: (app: Frog) => { GET: any; POST: any }
 }
 
 declare module 'frog/middlewares' {
