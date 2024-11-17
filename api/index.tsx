@@ -1,7 +1,7 @@
 /** @jsxImportSource frog/jsx */
 
 import { Button, Frog, type Context } from 'frog'
-import { serve } from 'frog/vercel'
+import { createFrameHandler } from 'frog/vercel'
 import { neynar } from 'frog/middlewares'
 import dotenv from 'dotenv'
 
@@ -496,4 +496,6 @@ app.frame('/view_rules', (c: Context) => {
   })
 })
 
-export const { GET, POST } = serve(app)
+const handler = createFrameHandler(app)
+export const GET = handler
+export const POST = handler
