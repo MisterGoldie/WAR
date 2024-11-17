@@ -1,0 +1,25 @@
+{
+  "name": "war-game-v4",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "frog vercel-build",
+    "dev": "frog dev",
+    "deploy": "vercel",
+    "start": "frog start"
+  },
+  "dependencies": {
+    "@types/react": "^18.3.12",
+    "@vercel/edge": "latest",
+    "@vercel/node": "^3.2.24",
+    "dotenv": "latest",
+    "frog": "^0.18.2"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/node": "^22.9.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.6.3",
+    "vercel": "^32.4.1"
+  }
+}
