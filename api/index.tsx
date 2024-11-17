@@ -1,7 +1,6 @@
 /** @jsxImportSource frog/jsx */
 
-import { Button, Frog, type Context } from 'frog'
-import { serve } from 'frog/vercel'
+import { Button, Frog, type Context, serve } from 'frog'
 import { neynar } from 'frog/middlewares'
 import dotenv from 'dotenv'
 
@@ -12,7 +11,7 @@ const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!
 const AIRSTACK_API_KEY = process.env.AIRSTACK_API_KEY!
 const AIRSTACK_API_KEY_SECONDARY = process.env.AIRSTACK_API_KEY_SECONDARY!
 
-// Add background image URL
+// Add background image URLS
 const backgroundUrl = 'https://bafybeic3qu53tn46qmtgvterldnbbavt2h5y2x7unpyyc7txh2kcx6f6jm.ipfs.w3s.link/Frame%2039%20(3).png'
 
 // Game Logic Interfaces

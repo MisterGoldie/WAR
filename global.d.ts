@@ -52,17 +52,13 @@ declare module 'frog' {
     }
   }
 
+  export const serve: (app: Frog) => { GET: any; POST: any }
+
   export class Frog {
     constructor(options: FrogOptions)
     frame: (path: string, handler: (context: Context) => void) => void
     use: (middleware: any) => this
   }
-}
-
-declare module 'frog/vercel' {
-  import { Frog } from 'frog'
-  export const handle: (app: Frog) => any
-  export const serve: (app: Frog) => { GET: any; POST: any }
 }
 
 declare module 'frog/middlewares' {
