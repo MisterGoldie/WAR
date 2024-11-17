@@ -1,7 +1,7 @@
 /** @jsxImportSource frog/jsx */
 
 import { Button, Frog, type Context } from 'frog'
-import { handle } from 'frog'
+import { handle } from 'frog/vercel'
 import { neynar } from 'frog/middlewares'
 import dotenv from 'dotenv'
 
