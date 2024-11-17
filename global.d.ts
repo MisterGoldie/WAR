@@ -46,7 +46,10 @@ declare module 'frog' {
     frame: (path: string, handler: (context: Context) => void) => void
     use: (middleware: any) => this
   }
-  
+}
+
+declare module 'frog/vercel' {
+  import { Frog } from 'frog'
   export const handle: (app: Frog) => any
 }
 
