@@ -99,3 +99,8 @@ declare module 'frog/vercel' {
   import { Frog } from 'frog'
   export const handle: (app: Frog) => { GET: any; POST: any }
 }
+
+declare module 'frog/edge' {
+  import { Frog } from 'frog'
+  export const createEdgeHandler: (app: Frog) => { GET: any; POST: any }
+}

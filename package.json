@@ -9,13 +9,13 @@
     "start": "frog start"
   },
   "dependencies": {
-    "hono": "^4.6.10",
-    "@hono/node-server": "^1.13.7",
+    "@hono/node-server": "^1.2.3",
     "@types/react": "^18.3.12",
     "@vercel/edge": "latest",
     "@vercel/node": "^3.2.24",
     "dotenv": "latest",
-    "frog": "^0.18.2"
+    "frog": "^0.18.2",
+    "hono": "^3.11.7"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",

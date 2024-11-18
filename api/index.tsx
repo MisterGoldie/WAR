@@ -1,7 +1,7 @@
 /** @jsxImportSource frog/jsx */
 
 import { Button, Frog, type Context } from 'frog'
-import { handle } from 'frog/vercel'
+import { createEdgeHandler } from 'frog/edge'
 import { neynar } from 'frog/middlewares'
 import dotenv from 'dotenv'
 
@@ -496,4 +496,6 @@ app.frame('/view_rules', (c: Context) => {
   })
 })
 
-export const { GET, POST } = handle(app)
+const handler = createEdgeHandler(app)
+export const GET = handler
+export const POST = handler
