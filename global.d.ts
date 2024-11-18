@@ -23,7 +23,8 @@ declare module 'frog' {
   }
 
   export interface ButtonProps {
-    action: string
+    action?: string
+    href?: string
     children: string | JSX.Element
   }
 

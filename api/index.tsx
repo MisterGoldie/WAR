@@ -66,7 +66,7 @@ export const app = new Frog({
 )
 
 // Function to create game UI component
-const GameUI = ({ state }: { state: GameState }) => {
+function GameUI({ state }: { state: GameState }) {
   const { playerDeck, computerDeck, playerCard, computerCard, message, isWar } = state
   
   return (
@@ -199,7 +199,7 @@ let gameState: GameState = createInitialState()
 type FrameContext = Context
 
 // Main game frame
-app.frame('/', (c: FrameContext) => {
+app.frame('/', (c) => {
   const { gameStatus } = gameState
   
   const buttons = []
@@ -214,138 +214,27 @@ app.frame('/', (c: FrameContext) => {
   buttons.push(<Button action="/reset_game">Reset Game</Button>)
   buttons.push(<Button action="/view_rules">Rules</Button>)
   
-  return c.res({
-    image: (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '1080px',
-          height: '1080px',
-          backgroundImage: `url(${backgroundUrl})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          color: 'white',
-          padding: '40px',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '40px'
-          }}
-        >
-          <h1 
-            style={{ 
-              fontSize: '64px',
-              textAlign: 'center',
-              margin: 0
-            }}
-          >
-            War Card Game
-          </h1>
-          
-          <div
-            style={{
-              display: 'flex',
-              fontSize: '32px',
-              textAlign: 'center',
-              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              padding: '20px',
-              borderRadius: '15px',
-              maxWidth: '800px',
-              justifyContent: 'center'
-            }}
-          >
-            Player Cards: {gameState.playerDeck.length} | Computer Cards: {gameState.computerDeck.length}
-          </div>
-          
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-around',
-              width: '100%',
-              gap: '40px'
-            }}
-          >
-            {gameState.playerCard && (
-              <div style={{ textAlign: 'center' }}>
-                <h3 style={{ fontSize: '24px', marginBottom: '10px' }}>Your Card</h3>
-                <img
-                  src={`/assets/cards/${gameState.playerCard.filename}`}
-                  alt={gameState.playerCard.label}
-                  style={{ width: '200px', height: '280px' }}
-                />
-              </div>
-            )}
-            
-            {gameState.computerCard && (
-              <div style={{ textAlign: 'center' }}>
-                <h3 style={{ fontSize: '24px', marginBottom: '10px' }}>Computer's Card</h3>
-                <img
-                  src={`/assets/cards/${gameState.computerCard.filename}`}
-                  alt={gameState.computerCard.label}
-                  style={{ width: '200px', height: '280px' }}
-                />
-              </div>
-            )}
-          </div>
-          
-          <div
-            style={{
-              fontSize: '36px',
-              textAlign: 'center',
-              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              padding: '20px',
-              borderRadius: '10px',
-              maxWidth: '800px'
-            }}
-          >
-            {gameState.isWar ? "⚔️ WAR! ⚔️" : gameState.message}
-          </div>
-        </div>
-      </div>
-    ),
+  return {
+    title: "War Card Game",
+    image: GameUI({ state: gameState }),
     intents: buttons,
-    meta: {
-      title: "War Card Game",
-      description: "A classic card game of War",
-      image: {
-        src: backgroundUrl,
-        aspectRatio: "1:1"
-      },
-      theme: {
-        accent: "#1a472a"
-      }
-    }
-  })
+    description: "A classic card game of War"
+  }
 })
 
 // Draw card action
-app.frame('/draw_card', (c: Context) => {
+app.frame('/draw_card', (c) => {
   const { playerDeck, computerDeck } = gameState
   
   if (!playerDeck.length || !computerDeck.length) {
     gameState.message = `Game Over! ${playerDeck.length ? 'Player' : 'Computer'} Wins!`
     gameState.gameStatus = 'ended'
-    return c.res({
+    return {
+      title: "War Card Game",
       image: GameUI({ state: gameState }),
       intents: [<Button action="/">Return to Game</Button>],
-      meta: {
-        title: "War Card Game",
-        description: "A classic card game of War",
-        image: {
-          src: backgroundUrl,
-          aspectRatio: "1:1"
-        },
-        theme: {
-          accent: "#1a472a"
-        }
-      }
-    })
+      description: "A classic card game of War"
+    }
   }
 
   const playerCard = playerDeck.shift()!
@@ -370,45 +259,27 @@ app.frame('/draw_card', (c: Context) => {
     }
     gameState.gameStatus = 'playing'
   }
-  return c.res({
+  return {
+    title: "War Card Game",
     image: GameUI({ state: gameState }),
     intents: [<Button action="/">Return to Game</Button>],
-    meta: {
-      title: "War Card Game",
-      description: "A classic card game of War",
-      image: {
-        src: backgroundUrl,
-        aspectRatio: "1:1"
-      },
-      theme: {
-        accent: "#1a472a"
-      }
-    }
-  })
+    description: "A classic card game of War"
+  }
 })
 
 // War continuation action
-app.frame('/continue_war', (c: Context) => {
+app.frame('/continue_war', (c) => {
   const { playerDeck, computerDeck, warPile } = gameState
   
   if (playerDeck.length < 4 || computerDeck.length < 4) {
     gameState.message = `${playerDeck.length > computerDeck.length ? 'Player' : 'Computer'} wins the war by default!`
     gameState.gameStatus = 'ended'
-    return c.res({
+    return {
+      title: "War Card Game",
       image: GameUI({ state: gameState }),
       intents: [<Button action="/">Return to Game</Button>],
-      meta: {
-        title: "War Card Game",
-        description: "A classic card game of War",
-        image: {
-          src: backgroundUrl,
-          aspectRatio: "1:1"
-        },
-        theme: {
-          accent: "#1a472a"
-        }
-      }
-    })
+      description: "A classic card game of War"
+    }
   }
 
   // Draw war cards
@@ -438,62 +309,36 @@ app.frame('/continue_war', (c: Context) => {
     gameState.isWar = false
     gameState.gameStatus = 'playing'
   }
-  return c.res({
+  return {
+    title: "War Card Game",
     image: GameUI({ state: gameState }),
     intents: [<Button action="/">Return to Game</Button>],
-    meta: {
-      title: "War Card Game",
-      description: "A classic card game of War",
-      image: {
-        src: backgroundUrl,
-        aspectRatio: "1:1"
-      },
-      theme: {
-        accent: "#1a472a"
-      }
-    }
-  })
+    description: "A classic card game of War"
+  }
 })
 
 // Reset game action
-app.frame('/reset_game', (c: Context) => {
+app.frame('/reset_game', (c) => {
   gameState = createInitialState()
-  return c.res({
+  return {
+    title: "War Card Game",
     image: GameUI({ state: gameState }),
     intents: [<Button action="/">Return to Game</Button>],
-    meta: {
-      title: "War Card Game",
-      description: "A classic card game of War",
-      image: {
-        src: backgroundUrl,
-        aspectRatio: "1:1"
-      },
-      theme: {
-        accent: "#1a472a"
-      }
-    }
-  })
+    description: "A classic card game of War"
+  }
 })
 
 // View rules action
-app.frame('/view_rules', (c: Context) => {
+app.frame('/view_rules', (c) => {
   gameState.message = 'Each player draws a card. Higher card wins! If cards match, WAR begins!'
-  return c.res({
+  return {
+    title: "War Card Game",
     image: GameUI({ state: gameState }),
     intents: [<Button action="/">Return to Game</Button>],
-    meta: {
-      title: "War Card Game",
-      description: "A classic card game of War",
-      image: {
-        src: backgroundUrl,
-        aspectRatio: "1:1"
-      },
-      theme: {
-        accent: "#1a472a"
-      }
-    }
-  })
+    description: "A classic card game of War"
+  }
 })
 
-const handler = (request: Request) => app.fetch(request)
-export default handler
+export default function handler(req: Request) {
+  return app.fetch(req)
+}
