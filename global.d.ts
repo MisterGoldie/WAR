@@ -104,3 +104,8 @@ declare module 'frog/edge' {
   import { Frog } from 'frog'
   export const createEdgeHandler: (app: Frog) => { GET: any; POST: any }
 }
+
+declare module 'frog/frames' {
+  import { Frog } from 'frog'
+  export const createFrames: (app: Frog) => { GET: any; POST: any }
+}
