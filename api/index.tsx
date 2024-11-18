@@ -495,4 +495,5 @@ app.frame('/view_rules', (c: Context) => {
   })
 })
 
-export default app
+const handler = (request: Request) => app.fetch(request)
+export default handler

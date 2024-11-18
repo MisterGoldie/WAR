@@ -53,6 +53,9 @@ declare module 'frog' {
   }
 
   export class Frog {
+    fetch(request: Request) {
+      throw new Error('Method not implemented.')
+    }
     constructor(options: FrogOptions)
     frame: (path: string, handler: (context: Context) => void) => void
     use: (middleware: any) => this
