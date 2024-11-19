@@ -57,6 +57,8 @@ function GameUI({ state }: { state: GameState }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        background: `url(${backgroundUrl})`,
+        backgroundSize: 'cover',
         backgroundColor: '#1a472a',
         color: 'white',
         padding: '20px',
