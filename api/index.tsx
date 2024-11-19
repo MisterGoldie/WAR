@@ -4,7 +4,7 @@ import type { NeynarVariables } from 'frog/middlewares'
 import { initializeGame, type Card, type LocalState as GameState } from './gameLogic.ts'
 import dotenv from 'dotenv'
 
-// Load environment variables
+// Load environment variable
 dotenv.config()
 
 // Define background image URLS
