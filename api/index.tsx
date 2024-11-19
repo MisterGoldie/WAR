@@ -15,7 +15,7 @@ const AIRSTACK_API_KEY_SECONDARY = process.env.AIRSTACK_API_KEY_SECONDARY!
 // Add background image URLS
 const backgroundUrl = 'https://bafybeic3qu53tn46qmtgvterldnbbavt2h5y2x7unpyyc7txh2kcx6f6jm.ipfs.w3s.link/Frame%2039%20(3).png'
 
-// Initialize the Frog app with Neynar integration
+// Initialize the Frog app with Neynar integrations
 export const app = new Frog({
   basePath: '/api',
   imageOptions: {
