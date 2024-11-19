@@ -5,7 +5,7 @@ import { neynar } from 'frog/middlewares'
 import dotenv from 'dotenv'
 import { initializeGame, createShuffledDeck, type Card, type LocalState as GameState } from './gameLogic'
 
-// Load environment variables
+// Load environment variabless
 dotenv.config()
 
 const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!
