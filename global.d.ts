@@ -1,38 +1,20 @@
 declare module 'frog' {
   export interface Context {
     res: (options: { 
-      image: any, 
-      intents: Array<{
-        type: 'button',
+      title?: string,
+      image: {
+        type: string,
         props: {
-          action?: string
-          href?: string
-          children: string
+          style?: Record<string, string | number>,
+          children: any
         }
-      }>,
-      meta?: {
-        title?: string
-        description?: string
-        image?: {
-          src: string
-          aspectRatio?: string
-        }
-        theme?: {
-          accent?: string
-        }
-      }
+      }, 
+      intents: Array<{
+        id: string,
+        action: string,
+        label: string
+      }>
     }) => void
-  }
-
-  export interface ButtonProps {
-    action?: string
-    href?: string
-    children: string
-  }
-
-  export const Button: (props: ButtonProps) => {
-    type: 'button'
-    props: ButtonProps
   }
   
   export interface FrogOptions {
@@ -64,8 +46,6 @@ declare module 'frog' {
     frame: (path: string, handler: (context: Context) => void) => void
     use: (middleware: any) => this
   }
-
-  export const serve: (app: Frog) => { GET: any; POST: any }
 }
 
 declare module 'frog/middlewares' {
@@ -85,23 +65,6 @@ declare module 'frog/middlewares' {
   }): any
 }
 
-declare module 'frog/jsx' {
-  export * from 'frog/jsx'
-}
-
-declare namespace JSX {
-    interface IntrinsicElements {
-      div: any;
-      h1: any;
-      h2: any;
-      h3: any;
-      p: any;
-      img: any;
-      button: any;
-      span: any;
-    }
-  }
-
 declare module 'frog/vercel' {
   import { Frog } from 'frog'
   export const handle: (app: Frog) => { GET: any; POST: any }
@@ -115,38 +78,4 @@ declare module 'frog/edge' {
 declare module 'frog/frames' {
   import { Frog } from 'frog'
   export const createFrames: (app: Frog) => { GET: any; POST: any }
-}
-
-export interface Card {
-    value: number;
-    suit: string;
-    label: string;
-    filename: string;
-}
-  
-export interface LocalState {
-    playerDeck: Card[];
-    computerDeck: Card[];
-    playerCard: Card | null;
-    computerCard: Card | null;
-    warPile: Card[];
-    message: string;
-    gameStatus: 'initial' | 'playing' | 'war' | 'ended';
-    isWar: boolean;
-}
-
-export function initializeGame(): LocalState {
-    // ... rest of the function remains the same ...
-}
-
-function createShuffledDeck(): Card[] {
-    // ... rest of the function remains the same ...
-}
-
-function getCardLabel(value: number): string {
-    // ... rest of the function remains the same ...
-}
-
-function shuffle(array: Card[]): Card[] {
-    // ... rest of the function remains the same ...
 }

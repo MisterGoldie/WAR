@@ -1,5 +1,6 @@
-import { Frog } from 'frog'
+import { Frog, type FrameContext } from 'frog'
 import { neynar } from 'frog/middlewares'
+import type { NeynarVariables } from 'frog/middlewares'
 import { initializeGame, type Card, type LocalState as GameState } from './gameLogic'
 import dotenv from 'dotenv'
 
@@ -8,10 +9,10 @@ dotenv.config()
 
 // Define background image URL
 const BACKGROUND_URL = 'https://bafybeic3qu53tn46qmtgvterldnbbavt2h5y2x7unpyyc7txh2kcx6f6jm.ipfs.w3s.link/Frame%2039%20(3).png'
-
 // Initialize the Frog app
 export const app = new Frog({
   basePath: '/api',
+  title: 'Frog App',
   imageOptions: {
     width: 1080,
     height: 1080,
@@ -138,8 +139,8 @@ function createGameUI(state: GameState) {
 let gameState = initializeGame()
 
 // Main game frame
-app.frame('/', (c) => {
-  return {
+app.frame('/', (c: FrameContext<{ Variables: NeynarVariables }>) => {
+  return c.res({
     title: "War Card Game",
     image: createGameUI(gameState),
     intents: [
@@ -149,12 +150,12 @@ app.frame('/', (c) => {
         label: 'Start Game'
       }
     ]
-  }
+  })
 })
 
 // Game route
-app.frame('/game', (c) => {
-  return {
+app.frame('/game', (c: FrameContext<{ Variables: NeynarVariables }>) => {
+  return c.res({
     title: "War Card Game",
     image: createGameUI(gameState),
     intents: [
@@ -169,11 +170,11 @@ app.frame('/game', (c) => {
         label: 'Reset Game'
       }
     ]
-  }
+  })
 })
 
 // Draw card route
-app.frame('/draw_card', (c) => {
+app.frame('/draw_card', (c: FrameContext<{ Variables: NeynarVariables }>) => {
   console.log('Drawing card')
   try {
     const { playerDeck, computerDeck } = gameState
@@ -181,7 +182,7 @@ app.frame('/draw_card', (c) => {
     
     if (!playerDeck.length || !computerDeck.length) {
       gameState.message = `Game Over! ${playerDeck.length ? 'Player' : 'Computer'} Wins!`
-      return {
+      return c.res({
         title: "War Card Game",
         image: createGameUI(gameState),
         intents: [
@@ -191,7 +192,7 @@ app.frame('/draw_card', (c) => {
             label: 'New Game'
           }
         ]
-      }
+      })
     }
 
     const playerCard = playerDeck.shift()!
@@ -216,7 +217,7 @@ app.frame('/draw_card', (c) => {
       }
       gameState.gameStatus = 'playing'
     }
-    return {
+    return c.res({
       title: "War Card Game",
       image: createGameUI(gameState),
       intents: [
@@ -231,10 +232,10 @@ app.frame('/draw_card', (c) => {
           label: 'Reset Game'
         }
       ]
-    }
+    })
   } catch (error) {
     console.error('Draw card error:', error)
-    return {
+    return c.res({
       title: "War Card Game",
       image: {
         type: 'div',
@@ -250,12 +251,12 @@ app.frame('/draw_card', (c) => {
           label: 'New Game'
         }
       ]
-    }
+    })
   }
 })
 
 // Continue war route
-app.frame('/continue_war', (c) => {
+app.frame('/continue_war', (c: FrameContext<{ Variables: NeynarVariables }>) => {
   console.log('Continuing war')
   try {
     const { playerDeck, computerDeck, warPile } = gameState
@@ -264,7 +265,7 @@ app.frame('/continue_war', (c) => {
     if (playerDeck.length < 4 || computerDeck.length < 4) {
       gameState.message = `${playerDeck.length > computerDeck.length ? 'Player' : 'Computer'} wins the war by default!`
       gameState.gameStatus = 'ended'
-      return {
+      return c.res({
         title: "War Card Game",
         image: createGameUI(gameState),
         intents: [
@@ -274,7 +275,7 @@ app.frame('/continue_war', (c) => {
             label: 'New Game'
           }
         ]
-      }
+      })
     }
 
     // Draw war cards
@@ -304,7 +305,7 @@ app.frame('/continue_war', (c) => {
       gameState.isWar = false
       gameState.gameStatus = 'playing'
     }
-    return {
+    return c.res({
       title: "War Card Game",
       image: createGameUI(gameState),
       intents: [
@@ -314,10 +315,10 @@ app.frame('/continue_war', (c) => {
           label: 'New Game'
         }
       ]
-    }
+    })
   } catch (error) {
     console.error('War continuation error:', error)
-    return {
+    return c.res({
       title: "War Card Game",
       image: {
         type: 'div',
@@ -333,17 +334,17 @@ app.frame('/continue_war', (c) => {
           label: 'New Game'
         }
       ]
-    }
+    })
   }
 })
 
 // Reset game route
-app.frame('/reset_game', (c) => {
+app.frame('/reset_game', (c: FrameContext<{ Variables: NeynarVariables }>) => {
   console.log('Resetting game')
   try {
     gameState = initializeGame()
     console.log('Game state reset')
-    return {
+    return c.res({
       title: "War Card Game",
       image: createGameUI(gameState),
       intents: [
@@ -358,10 +359,10 @@ app.frame('/reset_game', (c) => {
           label: 'Reset Game'
         }
       ]
-    }
+    })
   } catch (error) {
     console.error('Reset game error:', error)
-    return {
+    return c.res({
       title: "War Card Game",
       image: {
         type: 'div',
@@ -382,16 +383,16 @@ app.frame('/reset_game', (c) => {
           label: 'Reset Game'
         }
       ]
-    }
+    })
   }
 })
 
 // View rules route
-app.frame('/view_rules', (c) => {
+app.frame('/view_rules', (c: FrameContext<{ Variables: NeynarVariables }>) => {
   console.log('Viewing rules')
   try {
     gameState.message = 'Each player draws a card. Higher card wins! If cards match, WAR begins!'
-    return {
+    return c.res({
       title: "War Card Game - Rules",
       image: createGameUI(gameState),
       intents: [
@@ -401,10 +402,10 @@ app.frame('/view_rules', (c) => {
           label: 'New Game'
         }
       ]
-    }
+    })
   } catch (error) {
     console.error('View rules error:', error)
-    return {
+    return c.res({
       title: "War Card Game - Rules",
       image: {
         type: 'div',
@@ -420,7 +421,7 @@ app.frame('/view_rules', (c) => {
           label: 'New Game'
         }
       ]
-    }
+    })
   }
 })
 
