@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "frog vercel-build",
-    "dev": "frog dev",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "deploy": "vercel",
     "start": "frog start"
   },
