@@ -3,6 +3,7 @@
 import { Button, Frog, type Context } from 'frog'
 import { neynar } from 'frog/middlewares'
 import dotenv from 'dotenv'
+import { initializeGame, createShuffledDeck, type Card, type LocalState as GameState } from './gameLogic'
 
 // Load environment variables
 dotenv.config()
@@ -13,25 +14,6 @@ const AIRSTACK_API_KEY_SECONDARY = process.env.AIRSTACK_API_KEY_SECONDARY!
 
 // Add background image URLS
 const backgroundUrl = 'https://bafybeic3qu53tn46qmtgvterldnbbavt2h5y2x7unpyyc7txh2kcx6f6jm.ipfs.w3s.link/Frame%2039%20(3).png'
-
-// Game Logic Interfaces
-interface Card {
-  value: number
-  suit: string
-  label: string
-  filename: string
-}
-
-interface GameState {
-  playerDeck: Card[]
-  computerDeck: Card[]
-  playerCard: Card | null
-  computerCard: Card | null
-  warPile: Card[]
-  message: string
-  gameStatus: 'initial' | 'playing' | 'war' | 'ended'
-  isWar: boolean
-}
 
 // Initialize the Frog app with Neynar integration
 export const app = new Frog({
@@ -48,7 +30,7 @@ export const app = new Frog({
     ],
   },
   title: 'War Card Game',
-  initialState: createInitialState(),
+  initialState: initializeGame(),
   hub: {
     apiUrl: "https://hubs.airstack.xyz",
     fetchOptions: {
@@ -135,65 +117,8 @@ function GameUI({ state }: { state: GameState }) {
   )
 }
 
-// Function to create the initial game state
-function createInitialState(): GameState {
-  const deck = createDeck()
-  const shuffledDeck = shuffle(deck)
-  const midpoint = Math.floor(shuffledDeck.length / 2)
-  
-  return {
-    playerDeck: shuffledDeck.slice(0, midpoint),
-    computerDeck: shuffledDeck.slice(midpoint),
-    playerCard: null,
-    computerCard: null,
-    warPile: [],
-    message: "Welcome to War! Draw a card to begin.",
-    gameStatus: 'initial',
-    isWar: false
-  }
-}
-
-// Function to create a deck of cards
-function createDeck(): Card[] {
-  const suits = ['clubs', 'diamonds', 'hearts', 'spades']
-  const values = Array.from({ length: 13 }, (_, i) => i + 1)
-  
-  return suits.flatMap(suit => 
-    values.map(value => {
-      const label = getCardLabel(value)
-      return {
-        value,
-        suit,
-        label: `${label} of ${suit}`,
-        filename: `${value}_of_${suit}.png`
-      }
-    })
-  )
-}
-
-// Function to get the label for a card value
-function getCardLabel(value: number): string {
-  const specialCards: { [key: number]: string } = {
-    1: 'Ace',
-    11: 'Jack',
-    12: 'Queen',
-    13: 'King'
-  }
-  return specialCards[value] || value.toString()
-}
-
-// Function to shuffle an array of cards
-function shuffle(array: Card[]): Card[] {
-  const newArray = [...array]
-  for (let i = newArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[newArray[i], newArray[j]] = [newArray[j], newArray[i]]
-  }
-  return newArray
-}
-
 // Global game state
-let gameState: GameState = createInitialState()
+let gameState: GameState = initializeGame()
 
 // Add type for context
 type FrameContext = Context
@@ -358,7 +283,7 @@ app.frame('/continue_war', (c) => {
 app.frame('/reset_game', (c) => {
   console.log('Resetting game')
   try {
-    gameState = createInitialState()
+    gameState = initializeGame()
     console.log('Game state reset')
     return {
       title: "War Card Game",
