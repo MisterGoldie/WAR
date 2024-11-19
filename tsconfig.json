@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2017",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowJs": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -11,15 +11,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "incremental": true,
-    "jsxImportSource": "frog/jsx",
-    "paths": {
-      "frog/*": ["./node_modules/frog/*"]
-    },
-    "typeRoots": ["./node_modules/@types", "./global.d.ts"],
-    "types": ["node", "dotenv"]
+    "jsxImportSource": "frog/jsx"
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

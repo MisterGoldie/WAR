@@ -1,21 +1,18 @@
 /** @jsxImportSource frog/jsx */
-
-import { Button, Frog, type Context } from 'frog'
+import { Button, Frog } from 'frog'
 import { neynar } from 'frog/middlewares'
+import { initializeGame, type Card, type LocalState as GameState } from './gameLogic'
 import dotenv from 'dotenv'
-import { initializeGame, createShuffledDeck, type Card, type LocalState as GameState } from './gameLogic'
 
-// Load environment variabless
+// Load environment variables
 dotenv.config()
 
 const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!
-const AIRSTACK_API_KEY = process.env.AIRSTACK_API_KEY!
-const AIRSTACK_API_KEY_SECONDARY = process.env.AIRSTACK_API_KEY_SECONDARY!
 
-// Add background image URLS
-const backgroundUrl = 'https://bafybeic3qu53tn46qmtgvterldnbbavt2h5y2x7unpyyc7txh2kcx6f6jm.ipfs.w3s.link/Frame%2039%20(3).png'
+// Define background image URL
+const BACKGROUND_URL = 'https://bafybeic3qu53tn46qmtgvterldnbbavt2h5y2x7unpyyc7txh2kcx6f6jm.ipfs.w3s.link/Frame%2039%20(3).png'
 
-// Initialize the Frog app with Neynar integrations
+// Initialize the Frog app
 export const app = new Frog({
   basePath: '/api',
   imageOptions: {
@@ -28,17 +25,6 @@ export const app = new Frog({
         weight: 400,
       },
     ],
-  },
-  title: 'War Card Game',
-  initialState: initializeGame(),
-  hub: {
-    apiUrl: "https://hubs.airstack.xyz",
-    fetchOptions: {
-      headers: {
-        "x-airstack-hubs": AIRSTACK_API_KEY,
-        "x-airstack-hubs-secondary": AIRSTACK_API_KEY_SECONDARY
-      }
-    }
   }
 }).use(
   neynar({
@@ -48,24 +34,20 @@ export const app = new Frog({
 )
 
 // Function to create game UI component
-function GameUI({ state }: { state: GameState }) {
+function GameUI({ state }: { state: GameState }): JSX.Element {
   const { playerDeck, computerDeck, playerCard, computerCard, message, isWar } = state
   
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        background: `url(${backgroundUrl})`,
-        backgroundSize: 'cover',
-        backgroundColor: '#1a472a',
-        color: 'white',
-        padding: '20px',
-        width: '100%',
-        height: '100%',
-      }}
-    >
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      background: `url(${BACKGROUND_URL})`,
+      backgroundSize: 'cover',
+      width: '1080px',
+      height: '1080px',
+      padding: '40px',
+    }}>
       <h1 style={{ fontSize: '40px', marginBottom: '20px' }}>War Card Game</h1>
       
       <div style={{ fontSize: '24px', marginBottom: '20px' }}>
@@ -122,44 +104,27 @@ function GameUI({ state }: { state: GameState }) {
 // Global game state
 let gameState: GameState = initializeGame()
 
-// Add type for context
-type FrameContext = Context
-
-// Main game frame
+// Main game frame with proper typing
 app.frame('/', (c) => {
-  console.log('Rendering main game frame')
-  try {
-    const { gameStatus } = gameState
-    console.log('Current game status:', gameStatus)
-    
-    const buttons = []
-    if (gameStatus === 'initial' || gameStatus === 'playing') {
-      buttons.push(<Button action="/draw_card">Draw Card</Button>)
-    }
-    
-    if (gameStatus === 'war') {
-      buttons.push(<Button action="/continue_war">Continue War</Button>)
-    }
-    
-    buttons.push(<Button action="/reset_game">Reset Game</Button>)
-    buttons.push(<Button action="/view_rules">Rules</Button>)
-    
-    console.log('Generated buttons:', buttons.length)
-    return {
-      title: "War Card Game",
-      image: GameUI({ state: gameState }),
-      intents: buttons,
-      description: "A classic card game of War"
-    }
-  } catch (error) {
-    console.error('Frame generation error:', error)
-    return {
-      title: "War Card Game",
-      image: <div style={{padding: '20px'}}>Game is loading...</div>,
-      intents: [<Button action="/reset_game">Reset Game</Button>],
-      description: "A classic card game of War"
-    }
+  const { gameStatus } = gameState
+  
+  const buttons = []
+  if (gameStatus === 'initial' || gameStatus === 'playing') {
+    buttons.push(<Button action="/draw_card">Draw Card</Button>)
   }
+  if (gameStatus === 'war') {
+    buttons.push(<Button action="/continue_war">Continue War</Button>)
+  }
+  buttons.push(<Button action="/reset_game">Reset Game</Button>)
+  buttons.push(<Button action="/view_rules">Rules</Button>)
+  return c.res({
+    image: GameUI({ state: gameState }),
+    intents: buttons,
+    meta: {
+      title: "War Card Game",
+      description: "A classic card game of War"
+    }
+  })
 })
 
 // Draw card action

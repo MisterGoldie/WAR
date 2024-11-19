@@ -1,0 +1,5 @@
+{
+    "buildCommand": "frog vercel-build",
+    "installCommand": "npm install",
+    "framework": null
+  }
