@@ -1,4 +1,3 @@
-/** @jsxImportSource frog/jsx */
 import { Button, Frog } from 'frog'
 import { neynar } from 'frog/middlewares'
 import { initializeGame, type Card, type LocalState as GameState } from './gameLogic'
@@ -33,101 +32,151 @@ export const app = new Frog({
   })
 )
 
-// Function to create game UI component
-function GameUI({ state }: { state: GameState }): JSX.Element {
+// Function to create game UI
+function createGameUI(state: GameState) {
   const { playerDeck, computerDeck, playerCard, computerCard, message, isWar } = state
   
-  return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      background: `url(${BACKGROUND_URL})`,
-      backgroundSize: 'cover',
-      width: '1080px',
-      height: '1080px',
-      padding: '40px',
-    }}>
-      <h1 style={{ fontSize: '40px', marginBottom: '20px' }}>War Card Game</h1>
-      
-      <div style={{ fontSize: '24px', marginBottom: '20px' }}>
-        Player Cards: {playerDeck.length} | Computer Cards: {computerDeck.length}
-      </div>
-      
-      <div style={{
+  return {
+    type: 'div',
+    props: {
+      style: {
         display: 'flex',
-        justifyContent: 'space-around',
-        width: '100%',
-        marginBottom: '20px'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          {playerCard && (
-            <>
-              <h3>Your Card</h3>
-              <img
-                src={`/assets/cards/${playerCard.filename}`}
-                alt={playerCard.label}
-                style={{ width: '200px', height: '280px' }}
-              />
-            </>
-          )}
-        </div>
-        
-        <div style={{ textAlign: 'center' }}>
-          {computerCard && (
-            <>
-              <h3>Computer's Card</h3>
-              <img
-                src={`/assets/cards/${computerCard.filename}`}
-                alt={computerCard.label}
-                style={{ width: '200px', height: '280px' }}
-              />
-            </>
-          )}
-        </div>
-      </div>
-      
-      <div style={{
-        fontSize: '28px',
-        textAlign: 'center',
-        padding: '20px',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        borderRadius: '10px',
-        margin: '20px'
-      }}>
-        {isWar ? "⚔️ WAR! ⚔️" : message}
-      </div>
-    </div>
-  )
+        flexDirection: 'column',
+        alignItems: 'center',
+        background: `url(${BACKGROUND_URL})`,
+        backgroundSize: 'cover',
+        width: '1080px',
+        height: '1080px',
+        padding: '40px',
+      },
+      children: [
+        {
+          type: 'h1',
+          props: {
+            style: { fontSize: '40px', marginBottom: '20px' },
+            children: 'War Card Game'
+          }
+        },
+        {
+          type: 'div',
+          props: {
+            style: { fontSize: '24px', marginBottom: '20px' },
+            children: `Player Cards: ${playerDeck.length} | Computer Cards: ${computerDeck.length}`
+          }
+        },
+        {
+          type: 'div',
+          props: {
+            style: {
+              display: 'flex',
+              justifyContent: 'space-around',
+              width: '100%',
+              marginBottom: '20px'
+            },
+            children: [
+              playerCard && {
+                type: 'div',
+                props: {
+                  style: { textAlign: 'center' },
+                  children: [
+                    {
+                      type: 'h3',
+                      props: { children: 'Your Card' }
+                    },
+                    {
+                      type: 'img',
+                      props: {
+                        src: `/assets/cards/${playerCard.filename}`,
+                        alt: playerCard.label,
+                        style: { width: '200px', height: '280px' }
+                      }
+                    }
+                  ]
+                }
+              },
+              computerCard && {
+                type: 'div',
+                props: {
+                  style: { textAlign: 'center' },
+                  children: [
+                    {
+                      type: 'h3',
+                      props: { children: "Computer's Card" }
+                    },
+                    {
+                      type: 'img',
+                      props: {
+                        src: `/assets/cards/${computerCard.filename}`,
+                        alt: computerCard.label,
+                        style: { width: '200px', height: '280px' }
+                      }
+                    }
+                  ]
+                }
+              }
+            ].filter(Boolean)
+          }
+        },
+        {
+          type: 'div',
+          props: {
+            style: {
+              fontSize: '28px',
+              textAlign: 'center',
+              padding: '20px',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              borderRadius: '10px',
+              margin: '20px'
+            },
+            children: isWar ? "⚔️ WAR! ⚔️" : message
+          }
+        }
+      ]
+    }
+  }
 }
 
 // Global game state
 let gameState: GameState = initializeGame()
 
-// Main game frame with proper typing
+// Main game frame
 app.frame('/', (c) => {
-  const { gameStatus } = gameState
-  
-  const buttons = []
-  if (gameStatus === 'initial' || gameStatus === 'playing') {
-    buttons.push(<Button action="/draw_card">Draw Card</Button>)
+  return {
+    image: createGameUI(gameState),
+    intents: [{
+      type: 'button',
+      props: { 
+        action: '/game',
+        children: 'Start Game'
+      }
+    }]
   }
-  if (gameStatus === 'war') {
-    buttons.push(<Button action="/continue_war">Continue War</Button>)
-  }
-  buttons.push(<Button action="/reset_game">Reset Game</Button>)
-  buttons.push(<Button action="/view_rules">Rules</Button>)
-  return c.res({
-    image: GameUI({ state: gameState }),
-    intents: buttons,
-    meta: {
-      title: "War Card Game",
-      description: "A classic card game of War"
-    }
-  })
 })
 
-// Draw card action
+// Game route
+app.frame('/game', (c) => {
+  return {
+    image: createGameUI(gameState),
+    intents: [
+      {
+        type: 'button',
+        props: { 
+          action: '/draw_card',
+          children: 'Draw Card'
+        }
+      },
+      {
+        type: 'button',
+        props: { 
+          action: '/reset_game',
+          children: 'Reset Game'
+        }
+      }
+    ]
+  }
+})
+
+// Draw card route
 app.frame('/draw_card', (c) => {
   console.log('Drawing card')
   try {
@@ -136,12 +185,15 @@ app.frame('/draw_card', (c) => {
     
     if (!playerDeck.length || !computerDeck.length) {
       gameState.message = `Game Over! ${playerDeck.length ? 'Player' : 'Computer'} Wins!`
-      gameState.gameStatus = 'ended'
       return {
-        title: "War Card Game",
-        image: GameUI({ state: gameState }),
-        intents: [<Button action="/">Return to Game</Button>],
-        description: "A classic card game of War"
+        image: createGameUI(gameState),
+        intents: [{
+          type: 'button',
+          props: { 
+            action: '/game',
+            children: 'New Game'
+          }
+        }]
       }
     }
 
@@ -168,18 +220,35 @@ app.frame('/draw_card', (c) => {
       gameState.gameStatus = 'playing'
     }
     return {
-      title: "War Card Game",
-      image: GameUI({ state: gameState }),
-      intents: [<Button action="/">Return to Game</Button>],
-      description: "A classic card game of War"
+      image: createGameUI(gameState),
+      intents: [
+        {
+          type: 'button',
+          props: { 
+            action: '/draw_card',
+            children: 'Draw Card'
+          }
+        },
+        {
+          type: 'button',
+          props: { 
+            action: '/reset_game',
+            children: 'Reset Game'
+          }
+        }
+      ]
     }
   } catch (error) {
     console.error('Draw card error:', error)
     return {
-      title: "War Card Game",
       image: <div style={{padding: '20px'}}>Error drawing card. Please try again.</div>,
-      intents: [<Button action="/">Return to Game</Button>],
-      description: "A classic card game of War"
+      intents: [{
+        type: 'button',
+        props: { 
+          action: '/game',
+          children: 'New Game'
+        }
+      }]
     }
   }
 })
@@ -195,10 +264,14 @@ app.frame('/continue_war', (c) => {
       gameState.message = `${playerDeck.length > computerDeck.length ? 'Player' : 'Computer'} wins the war by default!`
       gameState.gameStatus = 'ended'
       return {
-        title: "War Card Game",
-        image: GameUI({ state: gameState }),
-        intents: [<Button action="/">Return to Game</Button>],
-        description: "A classic card game of War"
+        image: createGameUI(gameState),
+        intents: [{
+          type: 'button',
+          props: { 
+            action: '/game',
+            children: 'New Game'
+          }
+        }]
       }
     }
 
@@ -230,41 +303,75 @@ app.frame('/continue_war', (c) => {
       gameState.gameStatus = 'playing'
     }
     return {
-      title: "War Card Game",
-      image: GameUI({ state: gameState }),
-      intents: [<Button action="/">Return to Game</Button>],
-      description: "A classic card game of War"
+      image: createGameUI(gameState),
+      intents: [{
+        type: 'button',
+        props: { 
+          action: '/game',
+          children: 'New Game'
+        }
+      }]
     }
   } catch (error) {
     console.error('War continuation error:', error)
     return {
-      title: "War Card Game",
       image: <div style={{padding: '20px'}}>Error during war. Please try again.</div>,
-      intents: [<Button action="/">Return to Game</Button>],
-      description: "A classic card game of War"
+      intents: [{
+        type: 'button',
+        props: { 
+          action: '/game',
+          children: 'New Game'
+        }
+      }]
     }
   }
 })
 
-// Reset game action
+// Reset game route
 app.frame('/reset_game', (c) => {
   console.log('Resetting game')
   try {
     gameState = initializeGame()
     console.log('Game state reset')
     return {
-      title: "War Card Game",
-      image: GameUI({ state: gameState }),
-      intents: [<Button action="/">Return to Game</Button>],
-      description: "A classic card game of War"
+      image: createGameUI(gameState),
+      intents: [
+        {
+          type: 'button',
+          props: { 
+            action: '/draw_card',
+            children: 'Draw Card'
+          }
+        },
+        {
+          type: 'button',
+          props: { 
+            action: '/reset_game',
+            children: 'Reset Game'
+          }
+        }
+      ]
     }
   } catch (error) {
     console.error('Reset game error:', error)
     return {
-      title: "War Card Game",
       image: <div style={{padding: '20px'}}>Error resetting game. Please try again.</div>,
-      intents: [<Button action="/">Return to Game</Button>],
-      description: "A classic card game of War"
+      intents: [
+        {
+          type: 'button',
+          props: { 
+            action: '/draw_card',
+            children: 'Draw Card'
+          }
+        },
+        {
+          type: 'button',
+          props: { 
+            action: '/reset_game',
+            children: 'Reset Game'
+          }
+        }
+      ]
     }
   }
 })
@@ -275,18 +382,26 @@ app.frame('/view_rules', (c) => {
   try {
     gameState.message = 'Each player draws a card. Higher card wins! If cards match, WAR begins!'
     return {
-      title: "War Card Game",
-      image: GameUI({ state: gameState }),
-      intents: [<Button action="/">Return to Game</Button>],
-      description: "A classic card game of War"
+      image: createGameUI(gameState),
+      intents: [{
+        type: 'button',
+        props: { 
+          action: '/game',
+          children: 'New Game'
+        }
+      }]
     }
   } catch (error) {
     console.error('View rules error:', error)
     return {
-      title: "War Card Game",
       image: <div style={{padding: '20px'}}>Error loading rules. Please try again.</div>,
-      intents: [<Button action="/">Return to Game</Button>],
-      description: "A classic card game of War"
+      intents: [{
+        type: 'button',
+        props: { 
+          action: '/game',
+          children: 'New Game'
+        }
+      }]
     }
   }
 })

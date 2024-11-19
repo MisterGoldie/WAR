@@ -1,13 +1,17 @@
 /// <reference types="frog/jsx" />
 
 declare module 'frog' {
-  import { FC } from 'react'
-  import { JSX } from 'frog/jsx'
-  
   export interface Context {
     res: (options: { 
-      image: JSX.Element, 
-      intents: JSX.Element[] 
+      image: any, 
+      intents: Array<{
+        type: 'button',
+        props: {
+          action?: string
+          href?: string
+          children: string
+        }
+      }>,
       meta?: {
         title?: string
         description?: string
@@ -25,10 +29,13 @@ declare module 'frog' {
   export interface ButtonProps {
     action?: string
     href?: string
-    children: string | JSX.Element
+    children: string
   }
 
-  export const Button: (props: ButtonProps) => JSX.Element
+  export const Button: (props: ButtonProps) => {
+    type: 'button'
+    props: ButtonProps
+  }
   
   export interface FrogOptions {
     basePath?: string
@@ -54,9 +61,7 @@ declare module 'frog' {
   }
 
   export class Frog {
-    fetch(request: Request) {
-      throw new Error('Method not implemented.')
-    }
+    fetch(request: Request): Promise<Response>
     constructor(options: FrogOptions)
     frame: (path: string, handler: (context: Context) => void) => void
     use: (middleware: any) => this
