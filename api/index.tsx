@@ -1,7 +1,7 @@
 import { Frog, type FrameContext } from 'frog'
 import { neynar } from 'frog/middlewares'
 import type { NeynarVariables } from 'frog/middlewares'
-import { initializeGame, type Card, type LocalState as GameState } from './gameLogic'
+import { initializeGame, type Card, type LocalState as GameState } from './gameLogic.ts'
 import dotenv from 'dotenv'
 
 // Load environment variables
