@@ -236,7 +236,13 @@ app.frame('/draw_card', (c) => {
     console.error('Draw card error:', error)
     return {
       title: "War Card Game",
-      image: <div style={{padding: '20px'}}>Error drawing card. Please try again.</div>,
+      image: {
+        type: 'div',
+        props: {
+          style: { padding: '20px' },
+          children: 'Error drawing card. Please try again.'
+        }
+      },
       intents: [
         {
           id: 'new_game',
@@ -313,7 +319,13 @@ app.frame('/continue_war', (c) => {
     console.error('War continuation error:', error)
     return {
       title: "War Card Game",
-      image: <div style={{padding: '20px'}}>Error during war. Please try again.</div>,
+      image: {
+        type: 'div',
+        props: {
+          style: { padding: '20px' },
+          children: 'Error during war. Please try again.'
+        }
+      },
       intents: [
         {
           id: 'new_game',
@@ -351,7 +363,13 @@ app.frame('/reset_game', (c) => {
     console.error('Reset game error:', error)
     return {
       title: "War Card Game",
-      image: <div style={{padding: '20px'}}>Error resetting game. Please try again.</div>,
+      image: {
+        type: 'div',
+        props: {
+          style: { padding: '20px' },
+          children: 'Error resetting game. Please try again.'
+        }
+      },
       intents: [
         {
           id: 'draw',
@@ -388,7 +406,13 @@ app.frame('/view_rules', (c) => {
     console.error('View rules error:', error)
     return {
       title: "War Card Game - Rules",
-      image: <div style={{padding: '20px'}}>Error loading rules. Please try again.</div>,
+      image: {
+        type: 'div',
+        props: {
+          style: { padding: '20px' },
+          children: 'Error loading rules. Please try again.'
+        }
+      },
       intents: [
         {
           id: 'new_game',

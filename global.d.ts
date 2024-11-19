@@ -1,4 +1,4 @@
-/// <reference types="frog/jsx" />
+
 
 declare module 'frog' {
   export interface Context {
