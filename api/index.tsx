@@ -1,12 +1,10 @@
-import { Button, Frog } from 'frog'
+import { Frog } from 'frog'
 import { neynar } from 'frog/middlewares'
 import { initializeGame, type Card, type LocalState as GameState } from './gameLogic'
 import dotenv from 'dotenv'
 
 // Load environment variables
 dotenv.config()
-
-const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!
 
 // Define background image URL
 const BACKGROUND_URL = 'https://bafybeic3qu53tn46qmtgvterldnbbavt2h5y2x7unpyyc7txh2kcx6f6jm.ipfs.w3s.link/Frame%2039%20(3).png'
@@ -27,7 +25,7 @@ export const app = new Frog({
   }
 }).use(
   neynar({
-    apiKey: NEYNAR_API_KEY,
+    apiKey: process.env.NEYNAR_API_KEY!,
     features: ['interactor', 'cast'],
   })
 )
@@ -137,40 +135,38 @@ function createGameUI(state: GameState) {
 }
 
 // Global game state
-let gameState: GameState = initializeGame()
+let gameState = initializeGame()
 
 // Main game frame
 app.frame('/', (c) => {
   return {
+    title: "War Card Game",
     image: createGameUI(gameState),
-    intents: [{
-      type: 'button',
-      props: { 
+    intents: [
+      {
+        id: 'start',
         action: '/game',
-        children: 'Start Game'
+        label: 'Start Game'
       }
-    }]
+    ]
   }
 })
 
 // Game route
 app.frame('/game', (c) => {
   return {
+    title: "War Card Game",
     image: createGameUI(gameState),
     intents: [
       {
-        type: 'button',
-        props: { 
-          action: '/draw_card',
-          children: 'Draw Card'
-        }
+        id: 'draw',
+        action: '/draw_card',
+        label: 'Draw Card'
       },
       {
-        type: 'button',
-        props: { 
-          action: '/reset_game',
-          children: 'Reset Game'
-        }
+        id: 'reset',
+        action: '/reset_game',
+        label: 'Reset Game'
       }
     ]
   }
@@ -186,14 +182,15 @@ app.frame('/draw_card', (c) => {
     if (!playerDeck.length || !computerDeck.length) {
       gameState.message = `Game Over! ${playerDeck.length ? 'Player' : 'Computer'} Wins!`
       return {
+        title: "War Card Game",
         image: createGameUI(gameState),
-        intents: [{
-          type: 'button',
-          props: { 
+        intents: [
+          {
+            id: 'new_game',
             action: '/game',
-            children: 'New Game'
+            label: 'New Game'
           }
-        }]
+        ]
       }
     }
 
@@ -220,40 +217,38 @@ app.frame('/draw_card', (c) => {
       gameState.gameStatus = 'playing'
     }
     return {
+      title: "War Card Game",
       image: createGameUI(gameState),
       intents: [
         {
-          type: 'button',
-          props: { 
-            action: '/draw_card',
-            children: 'Draw Card'
-          }
+          id: 'draw',
+          action: '/draw_card',
+          label: 'Draw Card'
         },
         {
-          type: 'button',
-          props: { 
-            action: '/reset_game',
-            children: 'Reset Game'
-          }
+          id: 'reset',
+          action: '/reset_game',
+          label: 'Reset Game'
         }
       ]
     }
   } catch (error) {
     console.error('Draw card error:', error)
     return {
+      title: "War Card Game",
       image: <div style={{padding: '20px'}}>Error drawing card. Please try again.</div>,
-      intents: [{
-        type: 'button',
-        props: { 
+      intents: [
+        {
+          id: 'new_game',
           action: '/game',
-          children: 'New Game'
+          label: 'New Game'
         }
-      }]
+      ]
     }
   }
 })
 
-// War continuation action
+// Continue war route
 app.frame('/continue_war', (c) => {
   console.log('Continuing war')
   try {
@@ -264,14 +259,15 @@ app.frame('/continue_war', (c) => {
       gameState.message = `${playerDeck.length > computerDeck.length ? 'Player' : 'Computer'} wins the war by default!`
       gameState.gameStatus = 'ended'
       return {
+        title: "War Card Game",
         image: createGameUI(gameState),
-        intents: [{
-          type: 'button',
-          props: { 
+        intents: [
+          {
+            id: 'new_game',
             action: '/game',
-            children: 'New Game'
+            label: 'New Game'
           }
-        }]
+        ]
       }
     }
 
@@ -303,26 +299,28 @@ app.frame('/continue_war', (c) => {
       gameState.gameStatus = 'playing'
     }
     return {
+      title: "War Card Game",
       image: createGameUI(gameState),
-      intents: [{
-        type: 'button',
-        props: { 
+      intents: [
+        {
+          id: 'new_game',
           action: '/game',
-          children: 'New Game'
+          label: 'New Game'
         }
-      }]
+      ]
     }
   } catch (error) {
     console.error('War continuation error:', error)
     return {
+      title: "War Card Game",
       image: <div style={{padding: '20px'}}>Error during war. Please try again.</div>,
-      intents: [{
-        type: 'button',
-        props: { 
+      intents: [
+        {
+          id: 'new_game',
           action: '/game',
-          children: 'New Game'
+          label: 'New Game'
         }
-      }]
+      ]
     }
   }
 })
@@ -334,84 +332,73 @@ app.frame('/reset_game', (c) => {
     gameState = initializeGame()
     console.log('Game state reset')
     return {
+      title: "War Card Game",
       image: createGameUI(gameState),
       intents: [
         {
-          type: 'button',
-          props: { 
-            action: '/draw_card',
-            children: 'Draw Card'
-          }
+          id: 'draw',
+          action: '/draw_card',
+          label: 'Draw Card'
         },
         {
-          type: 'button',
-          props: { 
-            action: '/reset_game',
-            children: 'Reset Game'
-          }
+          id: 'reset',
+          action: '/reset_game',
+          label: 'Reset Game'
         }
       ]
     }
   } catch (error) {
     console.error('Reset game error:', error)
     return {
+      title: "War Card Game",
       image: <div style={{padding: '20px'}}>Error resetting game. Please try again.</div>,
       intents: [
         {
-          type: 'button',
-          props: { 
-            action: '/draw_card',
-            children: 'Draw Card'
-          }
+          id: 'draw',
+          action: '/draw_card',
+          label: 'Draw Card'
         },
         {
-          type: 'button',
-          props: { 
-            action: '/reset_game',
-            children: 'Reset Game'
-          }
+          id: 'reset',
+          action: '/reset_game',
+          label: 'Reset Game'
         }
       ]
     }
   }
 })
 
-// View rules action
+// View rules route
 app.frame('/view_rules', (c) => {
   console.log('Viewing rules')
   try {
     gameState.message = 'Each player draws a card. Higher card wins! If cards match, WAR begins!'
     return {
+      title: "War Card Game - Rules",
       image: createGameUI(gameState),
-      intents: [{
-        type: 'button',
-        props: { 
+      intents: [
+        {
+          id: 'new_game',
           action: '/game',
-          children: 'New Game'
+          label: 'New Game'
         }
-      }]
+      ]
     }
   } catch (error) {
     console.error('View rules error:', error)
     return {
+      title: "War Card Game - Rules",
       image: <div style={{padding: '20px'}}>Error loading rules. Please try again.</div>,
-      intents: [{
-        type: 'button',
-        props: { 
+      intents: [
+        {
+          id: 'new_game',
           action: '/game',
-          children: 'New Game'
+          label: 'New Game'
         }
-      }]
+      ]
     }
   }
 })
 
-export default function handler(req: Request) {
-  console.log('Handling request:', req.url)
-  try {
-    return app.fetch(req)
-  } catch (error) {
-    console.error('Handler error:', error)
-    throw error // Re-throw to maintain error handling chain
-  }
-}
+export const GET = async (req: Request) => app.fetch(req)
+export const POST = async (req: Request) => app.fetch(req)
