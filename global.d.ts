@@ -1,5 +1,3 @@
-
-
 declare module 'frog' {
   export interface Context {
     res: (options: { 
@@ -117,4 +115,38 @@ declare module 'frog/edge' {
 declare module 'frog/frames' {
   import { Frog } from 'frog'
   export const createFrames: (app: Frog) => { GET: any; POST: any }
+}
+
+export interface Card {
+    value: number;
+    suit: string;
+    label: string;
+    filename: string;
+}
+  
+export interface LocalState {
+    playerDeck: Card[];
+    computerDeck: Card[];
+    playerCard: Card | null;
+    computerCard: Card | null;
+    warPile: Card[];
+    message: string;
+    gameStatus: 'initial' | 'playing' | 'war' | 'ended';
+    isWar: boolean;
+}
+
+export function initializeGame(): LocalState {
+    // ... rest of the function remains the same ...
+}
+
+function createShuffledDeck(): Card[] {
+    // ... rest of the function remains the same ...
+}
+
+function getCardLabel(value: number): string {
+    // ... rest of the function remains the same ...
+}
+
+function shuffle(array: Card[]): Card[] {
+    // ... rest of the function remains the same ...
 }

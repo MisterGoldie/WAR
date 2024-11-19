@@ -1,11 +1,11 @@
-interface Card {
+export interface Card {
     value: number;
     suit: string;
     label: string;
     filename: string;
   }
   
-  interface LocalState {
+export interface LocalState {
     playerDeck: Card[];
     computerDeck: Card[];
     playerCard: Card | null;
@@ -16,7 +16,7 @@ interface Card {
     isWar: boolean;
   }
   
-  function initializeGame(): LocalState {
+export function initializeGame(): LocalState {
     const deck = createShuffledDeck();
     const midpoint = Math.floor(deck.length / 2);
     return {
@@ -49,13 +49,13 @@ interface Card {
   }
   
   function getCardLabel(value: number): string {
-    const specialCards: { [key: number]: string } = {
+    const specialCards = {
       1: 'Ace',
       11: 'Jack',
       12: 'Queen',
       13: 'King'
     };
-    return specialCards[value] || value.toString();
+    return specialCards[value as keyof typeof specialCards] || value.toString();
   }
   
   function shuffle(array: Card[]): Card[] {
@@ -66,5 +66,3 @@ interface Card {
     }
     return newArray;
   }
-  
-  export { initializeGame, createShuffledDeck, type Card, type LocalState };
