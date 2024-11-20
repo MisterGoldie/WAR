@@ -1,18 +1,42 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "target": "es2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "moduleResolution": "node",
+    "allowJs": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "strict": true,
-    "skipLibCheck": true,
     "jsx": "preserve",
-    "types": ["node"]
+    "module": "esnext",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "jsxImportSource": "frog/jsx",
+    "baseUrl": ".",
+    "paths": {
+      "frog/*": ["./node_modules/frog/*"]
+    },
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "noUncheckedIndexedAccess": true,
+    "noImplicitAny": true
   },
-  "include": ["api/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/api/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out"
+  ]
 }

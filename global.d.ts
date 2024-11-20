@@ -1,81 +1,75 @@
+/// <reference types="frog/jsx" />
+
 declare module 'frog' {
+  import { JSX } from 'frog/jsx'
+  
   export interface Context {
     res: (options: { 
-      title?: string,
-      image: {
-        type: string,
-        props: {
-          style?: Record<string, string | number>,
-          children: any
-        }
-      }, 
-      intents: Array<{
-        id: string,
-        action: string,
-        label: string
-      }>
-    }) => void
-  }
-  
-  export interface FrogOptions {
-    basePath?: string
-    imageOptions?: {
-      width: number
-      height: number
-      fonts?: Array<{
-        name: string
-        source: string
-        weight: number
-      }>
-    }
-    title?: string
-    initialState?: any
-    hub?: {
-      apiUrl: string
-      fetchOptions: {
-        headers: {
-          [key: string]: string
-        }
-      }
-    }
+      image: JSX.Element;
+      intents: JSX.Element[];
+    }) => void;
+    frameData?: {
+      fid?: number;
+    };
+    buttonValue?: string;
+    status?: string;
   }
 
-  export class Frog {
-    fetch(request: Request): Promise<Response>
-    constructor(options: FrogOptions)
-    frame: (path: string, handler: (context: Context) => void) => void
-    use: (middleware: any) => this
+  export interface FrogOptions {
+    basePath?: string;
+    imageOptions?: {
+      width: number;
+      height: number;
+    };
+    imageAspectRatio?: string;
+    title?: string;
+  }
+
+  export const Button: {
+    (props: { action?: string; value?: string; children: string | JSX.Element }): JSX.Element;
+    Link: (props: { href: string; children: string | JSX.Element }) => JSX.Element;
+  };
+
+  export class Frog<T = any> {
+    constructor(options: FrogOptions);
+    frame: (path: string, handler: (context: Context) => void) => void;
+    use: (middleware: any) => this;
   }
 }
 
 declare module 'frog/middlewares' {
   export interface NeynarVariables {
     interactor: {
-      fid: number
-    }
-    cast?: {
-      fid: number
-      hash: string
-    }
+      fid: number;
+    };
   }
 
   export function neynar(options: {
-    apiKey: string
-    features: string[]
-  }): any
+    apiKey: string;
+    features: string[];
+  }): any;
 }
 
 declare module 'frog/vercel' {
-  import { Frog } from 'frog'
-  export const handle: (app: Frog) => { GET: any; POST: any }
+  import type { Frog } from 'frog';
+  export function handle(app: Frog): {
+    GET: (req: Request) => Promise<Response>;
+    POST: (req: Request) => Promise<Response>;
+  };
 }
 
 declare module 'frog/edge' {
-  import { Frog } from 'frog'
-  export const createEdgeHandler: (app: Frog) => { GET: any; POST: any }
+  import type { Frog } from 'frog';
+  export function createEdgeHandler(app: Frog): {
+    GET: (req: Request) => Promise<Response>;
+    POST: (req: Request) => Promise<Response>;
+  };
 }
 
 declare module 'frog/frames' {
-  import { Frog } from 'frog'
-  export const createFrames: (app: Frog) => { GET: any; POST: any }
+  import type { Frog } from 'frog';
+  export function createFrames(app: Frog): {
+    GET: (req: Request) => Promise<Response>;
+    POST: (req: Request) => Promise<Response>;
+  };
 }

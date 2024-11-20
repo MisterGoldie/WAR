@@ -1,429 +1,201 @@
-import { Frog, type FrameContext } from 'frog'
-import { neynar } from 'frog/middlewares'
+/** @jsxImportSource frog/jsx */
+
+import { Button, Frog } from 'frog'
 import type { NeynarVariables } from 'frog/middlewares'
-import { initializeGame, type Card, type LocalState as GameState } from './gameLogic.ts'
-import dotenv from 'dotenv'
+import { neynar } from 'frog/middlewares'
 
-// Load environment variable
-dotenv.config()
+// Constants
+const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY as string;
 
-// Define background image URLS
-const BACKGROUND_URL = 'https://bafybeic3qu53tn46qmtgvterldnbbavt2h5y2x7unpyyc7txh2kcx6f6jm.ipfs.w3s.link/Frame%2039%20(3).png'
-// Initialize the Frog app
-export const app = new Frog({
-  basePath: '/api',
-  title: 'Frog App',
-  imageOptions: {
-    width: 1080,
-    height: 1080,
-    fonts: [
-      {
-        name: 'Gloria Hallelujah',
-        source: 'google',
-        weight: 400,
-      },
-    ],
-  }
-}).use(
-  neynar({
-    apiKey: process.env.NEYNAR_API_KEY!,
-    features: ['interactor', 'cast'],
-  })
-)
+// Define types
+type Card = {
+  rank: number;
+  suit: string;
+  display: string;
+};
 
-// Function to create game UI
-function createGameUI(state: GameState) {
-  const { playerDeck, computerDeck, playerCard, computerCard, message, isWar } = state
+type GameState = {
+  playerDeck: Card[];
+  cpuDeck: Card[];
+  playerCard: Card | null;
+  cpuCard: Card | null;
+  warPile: Card[];
+  isWar: boolean;
+  gameOver: boolean;
+};
+
+// Game Logic Functions
+function createDeck(): Card[] {
+  const suits = ['♠️', '♣️', '♥️', '♦️'];
+  const ranks = Array.from({ length: 13 }, (_, i) => i + 2);
+  const displayRanks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
   
-  return {
-    type: 'div',
-    props: {
-      style: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        background: `url(${BACKGROUND_URL})`,
-        backgroundSize: 'cover',
-        width: '1080px',
-        height: '1080px',
-        padding: '40px',
-      },
-      children: [
-        {
-          type: 'h1',
-          props: {
-            style: { fontSize: '40px', marginBottom: '20px' },
-            children: 'War Card Game'
-          }
-        },
-        {
-          type: 'div',
-          props: {
-            style: { fontSize: '24px', marginBottom: '20px' },
-            children: `Player Cards: ${playerDeck.length} | Computer Cards: ${computerDeck.length}`
-          }
-        },
-        {
-          type: 'div',
-          props: {
-            style: {
-              display: 'flex',
-              justifyContent: 'space-around',
-              width: '100%',
-              marginBottom: '20px'
-            },
-            children: [
-              playerCard && {
-                type: 'div',
-                props: {
-                  style: { textAlign: 'center' },
-                  children: [
-                    {
-                      type: 'h3',
-                      props: { children: 'Your Card' }
-                    },
-                    {
-                      type: 'img',
-                      props: {
-                        src: `/assets/cards/${playerCard.filename}`,
-                        alt: playerCard.label,
-                        style: { width: '200px', height: '280px' }
-                      }
-                    }
-                  ]
-                }
-              },
-              computerCard && {
-                type: 'div',
-                props: {
-                  style: { textAlign: 'center' },
-                  children: [
-                    {
-                      type: 'h3',
-                      props: { children: "Computer's Card" }
-                    },
-                    {
-                      type: 'img',
-                      props: {
-                        src: `/assets/cards/${computerCard.filename}`,
-                        alt: computerCard.label,
-                        style: { width: '200px', height: '280px' }
-                      }
-                    }
-                  ]
-                }
-              }
-            ].filter(Boolean)
-          }
-        },
-        {
-          type: 'div',
-          props: {
-            style: {
-              fontSize: '28px',
-              textAlign: 'center',
-              padding: '20px',
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              borderRadius: '10px',
-              margin: '20px'
-            },
-            children: isWar ? "⚔️ WAR! ⚔️" : message
-          }
-        }
-      ]
-    }
+  const deck: Card[] = [];
+  for (const suit of suits) {
+    ranks.forEach((rank, i) => {
+      deck.push({ rank, suit, display: displayRanks[i] + suit });
+    });
   }
+  return shuffle(deck);
 }
 
-// Global game state
-let gameState = initializeGame()
+function shuffle<T>(array: T[]): T[] {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+}
 
-// Main game frame
-app.frame('/', (c: FrameContext<{ Variables: NeynarVariables }>) => {
+function encodeState(state: GameState): string {
+  return Buffer.from(JSON.stringify(state)).toString('base64');
+}
+
+function decodeState(encodedState: string): GameState {
+  return JSON.parse(Buffer.from(encodedState, 'base64').toString());
+}
+
+function initializeGame(): GameState {
+  const deck = createDeck();
+  const midpoint = Math.floor(deck.length / 2);
+  
+  return {
+    playerDeck: deck.slice(0, midpoint),
+    cpuDeck: deck.slice(midpoint),
+    playerCard: null,
+    cpuCard: null,
+    warPile: [],
+    isWar: false,
+    gameOver: false
+  };
+}
+
+// Create Frog app instance
+export const app = new Frog<{ Variables: NeynarVariables }>({
+  basePath: '/api',
+  imageOptions: {
+    width: 1080,
+    height: 1080
+  },
+  imageAspectRatio: '1:1',
+  title: 'WAR Card Game'
+});
+
+app.use(neynar({
+  apiKey: NEYNAR_API_KEY,
+  features: ['interactor']
+}));
+
+// Routes
+app.frame('/', (c) => {
   return c.res({
-    title: "War Card Game",
-    image: createGameUI(gameState),
+    image: (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '1080px',
+          height: '1080px',
+          backgroundColor: '#1a1a1a',
+          color: 'white',
+          padding: '40px'
+        }}
+      >
+        <h1 style={{ fontSize: '72px', marginBottom: '40px' }}>
+          War Card Game
+        </h1>
+        <div style={{ fontSize: '36px', textAlign: 'center' }}>
+          Click Start to begin!
+        </div>
+      </div>
+    ),
     intents: [
-      {
-        id: 'start',
-        action: '/game',
-        label: 'Start Game'
-      }
+      <Button action="/game">Start Game</Button>
     ]
-  })
-})
+  });
+});
 
-// Game route
-app.frame('/game', (c: FrameContext<{ Variables: NeynarVariables }>) => {
+app.frame('/game', (c) => {
+  const { buttonValue } = c;
+  let state: GameState = buttonValue?.startsWith('draw:') 
+    ? decodeState(buttonValue.split(':')[1])
+    : initializeGame();
+    
+  if (buttonValue?.startsWith('draw:')) {
+    // Draw cards
+    if (!state.isWar) {
+      state.playerCard = state.playerDeck.pop() || null;
+      state.cpuCard = state.cpuDeck.pop() || null;
+      
+      if (state.playerCard && state.cpuCard) {
+        if (state.playerCard.rank === state.cpuCard.rank) {
+          state.isWar = true;
+          state.warPile.push(state.playerCard, state.cpuCard);
+        } else {
+          const winner = state.playerCard.rank > state.cpuCard.rank ? 'player' : 'cpu';
+          if (winner === 'player') {
+            state.playerDeck.unshift(state.playerCard, state.cpuCard);
+          } else {
+            state.cpuDeck.unshift(state.playerCard, state.cpuCard);
+          }
+        }
+      }
+    } else {
+      // Handle war
+      for (let i = 0; i < 3; i++) {
+        const playerWarCard = state.playerDeck.pop();
+        const cpuWarCard = state.cpuDeck.pop();
+        if (playerWarCard && cpuWarCard) {
+          state.warPile.push(playerWarCard, cpuWarCard);
+        }
+      }
+      state.isWar = false;
+    }
+    
+    // Check for game over
+    if (state.playerDeck.length === 0 || state.cpuDeck.length === 0) {
+      state.gameOver = true;
+    }
+  }
+  
+  const encodedState = encodeState(state);
+  
   return c.res({
-    title: "War Card Game",
-    image: createGameUI(gameState),
+    image: (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '1080px',
+          height: '1080px',
+          backgroundColor: '#1a1a1a',
+          color: 'white',
+          padding: '40px'
+        }}
+      >
+        <div style={{ fontSize: '24px', marginBottom: '20px' }}>
+          Player Cards: {state.playerDeck.length} | CPU Cards: {state.cpuDeck.length}
+        </div>
+        {state.playerCard && state.cpuCard && (
+          <div style={{ fontSize: '48px', marginBottom: '20px' }}>
+            {state.playerCard.display} vs {state.cpuCard.display}
+          </div>
+        )}
+      </div>
+    ),
     intents: [
-      {
-        id: 'draw',
-        action: '/draw_card',
-        label: 'Draw Card'
-      },
-      {
-        id: 'reset',
-        action: '/reset_game',
-        label: 'Reset Game'
-      }
+      state.gameOver 
+        ? <Button action="/">Play Again</Button>
+        : <Button value={`draw:${encodedState}`}>Draw Card</Button>
     ]
-  })
-})
+  });
+});
 
-// Draw card route
-app.frame('/draw_card', (c: FrameContext<{ Variables: NeynarVariables }>) => {
-  console.log('Drawing card')
-  try {
-    const { playerDeck, computerDeck } = gameState
-    console.log('Deck sizes - Player:', playerDeck.length, 'Computer:', computerDeck.length)
-    
-    if (!playerDeck.length || !computerDeck.length) {
-      gameState.message = `Game Over! ${playerDeck.length ? 'Player' : 'Computer'} Wins!`
-      return c.res({
-        title: "War Card Game",
-        image: createGameUI(gameState),
-        intents: [
-          {
-            id: 'new_game',
-            action: '/game',
-            label: 'New Game'
-          }
-        ]
-      })
-    }
-
-    const playerCard = playerDeck.shift()!
-    const computerCard = computerDeck.shift()!
-    
-    gameState.playerCard = playerCard
-    gameState.computerCard = computerCard
-    
-    if (playerCard.value === computerCard.value) {
-      gameState.isWar = true
-      gameState.gameStatus = 'war'
-      gameState.warPile = [playerCard, computerCard]
-      gameState.message = "It's a tie! War begins!"
-    } else {
-      const winner = playerCard.value > computerCard.value ? 'player' : 'computer'
-      if (winner === 'player') {
-        playerDeck.push(playerCard, computerCard)
-        gameState.message = `You win with ${playerCard.label}!`
-      } else {
-        computerDeck.push(playerCard, computerCard)
-        gameState.message = `Computer wins with ${computerCard.label}!`
-      }
-      gameState.gameStatus = 'playing'
-    }
-    return c.res({
-      title: "War Card Game",
-      image: createGameUI(gameState),
-      intents: [
-        {
-          id: 'draw',
-          action: '/draw_card',
-          label: 'Draw Card'
-        },
-        {
-          id: 'reset',
-          action: '/reset_game',
-          label: 'Reset Game'
-        }
-      ]
-    })
-  } catch (error) {
-    console.error('Draw card error:', error)
-    return c.res({
-      title: "War Card Game",
-      image: {
-        type: 'div',
-        props: {
-          style: { padding: '20px' },
-          children: 'Error drawing card. Please try again.'
-        }
-      },
-      intents: [
-        {
-          id: 'new_game',
-          action: '/game',
-          label: 'New Game'
-        }
-      ]
-    })
-  }
-})
-
-// Continue war route
-app.frame('/continue_war', (c: FrameContext<{ Variables: NeynarVariables }>) => {
-  console.log('Continuing war')
-  try {
-    const { playerDeck, computerDeck, warPile } = gameState
-    console.log('War pile size:', warPile.length)
-    
-    if (playerDeck.length < 4 || computerDeck.length < 4) {
-      gameState.message = `${playerDeck.length > computerDeck.length ? 'Player' : 'Computer'} wins the war by default!`
-      gameState.gameStatus = 'ended'
-      return c.res({
-        title: "War Card Game",
-        image: createGameUI(gameState),
-        intents: [
-          {
-            id: 'new_game',
-            action: '/game',
-            label: 'New Game'
-          }
-        ]
-      })
-    }
-
-    // Draw war cards
-    for (let i = 0; i < 3; i++) {
-      warPile.push(playerDeck.shift()!, computerDeck.shift()!)
-    }
-    
-    const playerCard = playerDeck.shift()!
-    const computerCard = computerDeck.shift()!
-    warPile.push(playerCard, computerCard)
-    
-    gameState.playerCard = playerCard
-    gameState.computerCard = computerCard
-    
-    if (playerCard.value === computerCard.value) {
-      gameState.message = "Another tie! The war continues!"
-    } else {
-      const winner = playerCard.value > computerCard.value ? 'player' : 'computer'
-      if (winner === 'player') {
-        playerDeck.push(...warPile)
-        gameState.message = `You win the war with ${playerCard.label}!`
-      } else {
-        computerDeck.push(...warPile)
-        gameState.message = `Computer wins the war with ${computerCard.label}!`
-      }
-      gameState.warPile = []
-      gameState.isWar = false
-      gameState.gameStatus = 'playing'
-    }
-    return c.res({
-      title: "War Card Game",
-      image: createGameUI(gameState),
-      intents: [
-        {
-          id: 'new_game',
-          action: '/game',
-          label: 'New Game'
-        }
-      ]
-    })
-  } catch (error) {
-    console.error('War continuation error:', error)
-    return c.res({
-      title: "War Card Game",
-      image: {
-        type: 'div',
-        props: {
-          style: { padding: '20px' },
-          children: 'Error during war. Please try again.'
-        }
-      },
-      intents: [
-        {
-          id: 'new_game',
-          action: '/game',
-          label: 'New Game'
-        }
-      ]
-    })
-  }
-})
-
-// Reset game route
-app.frame('/reset_game', (c: FrameContext<{ Variables: NeynarVariables }>) => {
-  console.log('Resetting game')
-  try {
-    gameState = initializeGame()
-    console.log('Game state reset')
-    return c.res({
-      title: "War Card Game",
-      image: createGameUI(gameState),
-      intents: [
-        {
-          id: 'draw',
-          action: '/draw_card',
-          label: 'Draw Card'
-        },
-        {
-          id: 'reset',
-          action: '/reset_game',
-          label: 'Reset Game'
-        }
-      ]
-    })
-  } catch (error) {
-    console.error('Reset game error:', error)
-    return c.res({
-      title: "War Card Game",
-      image: {
-        type: 'div',
-        props: {
-          style: { padding: '20px' },
-          children: 'Error resetting game. Please try again.'
-        }
-      },
-      intents: [
-        {
-          id: 'draw',
-          action: '/draw_card',
-          label: 'Draw Card'
-        },
-        {
-          id: 'reset',
-          action: '/reset_game',
-          label: 'Reset Game'
-        }
-      ]
-    })
-  }
-})
-
-// View rules route
-app.frame('/view_rules', (c: FrameContext<{ Variables: NeynarVariables }>) => {
-  console.log('Viewing rules')
-  try {
-    gameState.message = 'Each player draws a card. Higher card wins! If cards match, WAR begins!'
-    return c.res({
-      title: "War Card Game - Rules",
-      image: createGameUI(gameState),
-      intents: [
-        {
-          id: 'new_game',
-          action: '/game',
-          label: 'New Game'
-        }
-      ]
-    })
-  } catch (error) {
-    console.error('View rules error:', error)
-    return c.res({
-      title: "War Card Game - Rules",
-      image: {
-        type: 'div',
-        props: {
-          style: { padding: '20px' },
-          children: 'Error loading rules. Please try again.'
-        }
-      },
-      intents: [
-        {
-          id: 'new_game',
-          action: '/game',
-          label: 'New Game'
-        }
-      ]
-    })
-  }
-})
-
-export const GET = async (req: Request) => app.fetch(req)
-export const POST = async (req: Request) => app.fetch(req)
+// Export the handlers directly from the app instance
+export const GET = app.fetch;
+export const POST = app.fetch;

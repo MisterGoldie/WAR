@@ -1,17 +1,17 @@
 {
-  "name": "war-game-v4",
+  "name": "war-card-game",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "frog vercel-build",
+    "dev": "frog dev",
     "deploy": "vercel",
     "start": "frog start"
   },
   "dependencies": {
     "dotenv": "latest",
-    "frog": "^0.18.2",
-    "hono": "^4.4.4"
+    "frog": "0.16.0",
+    "@vercel/node": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
