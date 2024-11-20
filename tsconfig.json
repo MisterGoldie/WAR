@@ -1,42 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "moduleResolution": "node",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "module": "esnext",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "strict": true,
-    "noEmit": true,
-    "jsxImportSource": "frog/jsx",
-    "baseUrl": ".",
-    "paths": {
-      "frog/*": ["./node_modules/frog/*"]
-    },
-    "types": ["node"],
-    "forceConsistentCasingInFileNames": true,
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "noUncheckedIndexedAccess": true,
-    "noImplicitAny": true
+    "jsx": "preserve",
+    "jsxImportSource": "frog",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "app/api/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    ".next",
-    "out"
-  ]
+  "include": ["api/**/*"],
+  "exclude": ["node_modules"]
 }

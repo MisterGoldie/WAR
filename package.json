@@ -3,18 +3,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "frog vercel-build",
-    "dev": "frog dev",
+    "build": "tsc && frog vercel-build",
+    "dev": "tsx watch api/index.tsx",
     "deploy": "vercel",
-    "start": "frog start"
+    "start": "tsx api/index.tsx"
   },
   "dependencies": {
     "dotenv": "latest",
-    "frog": "0.16.0",
-    "@vercel/node": "^3.0.0"
+    "frog": "0.16.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.0.0",
     "vercel": "latest"
   }
