@@ -49,20 +49,22 @@ export function initializeGame(): LocalState {
   }
   
   function getCardLabel(value: number): string {
-    const specialCards = {
+    const specialCards: Record<number, string> = {
       1: 'Ace',
       11: 'Jack',
       12: 'Queen',
       13: 'King'
     };
-    return specialCards[value as keyof typeof specialCards] || value.toString();
+    return specialCards[value] || value.toString();
   }
   
-  function shuffle(array: Card[]): Card[] {
+  function shuffle<T>(array: T[]): T[] {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      const temp = newArray[i]!;
+      newArray[i] = newArray[j]!;
+      newArray[j] = temp;
     }
     return newArray;
   }

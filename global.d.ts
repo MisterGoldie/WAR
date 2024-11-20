@@ -31,6 +31,7 @@ declare module 'frog' {
   };
 
   export class Frog<T = any> {
+    fetch: any;
     constructor(options: FrogOptions);
     frame: (path: string, handler: (context: Context) => void) => void;
     use: (middleware: any) => this;

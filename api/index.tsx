@@ -43,7 +43,9 @@ function shuffle<T>(array: T[]): T[] {
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    const temp = newArray[i]!;
+    newArray[i] = newArray[j]!;
+    newArray[j] = temp;
   }
   return newArray;
 }
@@ -120,10 +122,19 @@ app.frame('/', (c) => {
 
 app.frame('/game', (c) => {
   const { buttonValue } = c;
-  let state: GameState = buttonValue?.startsWith('draw:') 
-    ? decodeState(buttonValue.split(':')[1])
-    : initializeGame();
-    
+  let state: GameState;
+  
+  if (buttonValue?.startsWith('draw:')) {
+    const encodedState = buttonValue.split(':')[1];
+    if (encodedState) {
+      state = decodeState(encodedState);
+    } else {
+      state = initializeGame();
+    }
+  } else {
+    state = initializeGame();
+  }
+  
   if (buttonValue?.startsWith('draw:')) {
     // Draw cards
     if (!state.isWar) {
